@@ -11,11 +11,10 @@ def proxy_dps():
     )
 
     try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        return jsonify(response.json())
+        r = requests.get(url, timeout=10)
+        r.raise_for_status()
+        return jsonify(r.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-# Azure starts Gunicorn like: gunicorn --bind=0.0.0.0 app:app
+# Flask app object = app (used by Gunicorn)
