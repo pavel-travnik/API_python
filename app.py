@@ -1,25 +1,21 @@
 from flask import Flask, jsonify
+import requests
 
 app = Flask(__name__)
 
 @app.route("/api/get_dps_data", methods=["GET"])
-def get_dps_data():
-    data = [
-        {
-            "isin": "UNIQADPS001",
-            "fond": "Akciový ú.f. UNIQA p.s. a.s.",
-            "date": "2026-03-13",
-            "value": 1.9152,
-            "currency": "CZK"
-        },
-        {
-            "isin": "UNIQADPS001",
-            "fond": "Akciový ú.f. UNIQA p.s. a.s.",
-            "date": "2026-03-20",
-            "value": 1.8678,
-            "currency": "CZK"
-        }
-    ]
-    return jsonify(data)
+def proxy_dps():
+    url = (
+        "https://portfolio-func-app-hvc9bbfbahdmhbb0.westeurope-01.azurewebsites.net/"
+        "api/get_dps_data?isin=UNIQADPS001&code=CitP-pusUsjuAOQKbBJ9Mm1OE4QDSFghxyWPfJdWsONdAzFu9Pbutw=="
+    )
 
-# Azure Web App spustí Gunicorn s app:app
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Azure starts Gunicorn like: gunicorn --bind=0.0.0.0 app:app
